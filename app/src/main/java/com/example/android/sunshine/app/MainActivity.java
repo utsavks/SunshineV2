@@ -3,6 +3,7 @@ package com.example.android.sunshine.app;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,8 +81,49 @@ public class MainActivity extends ActionBarActivity {
             ListView listview_forecast = (ListView)rootView.findViewById(R.id.listview_forecast);
             listview_forecast.setAdapter(forecastAdapter);
 
-            return rootView;
+            HttpURLConnection urlConn = null;
+            BufferedReader reader = null;
+            String forecastJSONStr = null;
 
+            try {
+                String baseURL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=247667&mode=json&units=metric&cnt=7";
+                String appID = "&APPID=" + BuildConfig.OPEN_WEATHER_MAP_API_KEY;
+
+                URL url = new URL(baseURL.concat(appID));
+
+                urlConn = (HttpURLConnection) url.openConnection();
+                urlConn.setRequestMethod("GET");
+                urlConn.connect();
+
+                InputStream inputStream = urlConn.getInputStream();
+                if (inputStream == null) {
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuffer buffer = new StringBuffer();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    return null;
+                }
+                forecastJSONStr = buffer.toString();
+            }catch(IOException e){
+                Log.e("PlaceHolder","Error",e);}
+            finally {
+                if (urlConn != null)
+                    urlConn.disconnect();
+                if (reader != null)
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e("PlaceHolder", "Error closing stream", e);
+                    }
+            }
+
+            return rootView;
 
         }
     }
