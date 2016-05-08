@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -34,6 +37,12 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         String[] forecastArray ={"Today - Sunny - 88/63","Tomorrow - Foggy - 70/46",
@@ -48,6 +57,24 @@ public class ForecastFragment extends Fragment {
 
         return rootView;
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecast_fragment,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_refresh) {
+            FetchWeatherTask f = new FetchWeatherTask();
+            f.execute();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public static class FetchWeatherTask extends AsyncTask<Void,Void,Void> {
@@ -86,7 +113,7 @@ public class ForecastFragment extends Fragment {
                 }
                 forecastJSONStr = buffer.toString();
             }catch(IOException e){
-                Log.e("PlaceHolder","Error",e);}
+                Log.e(LOG_TAG,"Error",e);}
             finally {
                 if (urlConn != null)
                     urlConn.disconnect();
@@ -95,7 +122,7 @@ public class ForecastFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("PlaceHolder", "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
