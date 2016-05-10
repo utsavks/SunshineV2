@@ -4,6 +4,7 @@ package com.example.android.sunshine.app;
  * Created by UTSAV on 08-05-2016.
  */
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,9 +17,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,6 +67,16 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview_forecast = (ListView)rootView.findViewById(R.id.listview_forecast);
         listview_forecast.setAdapter(forecastAdapter);
+
+        listview_forecast.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String extraWeatherData = forecastAdapter.getItem(i);
+                Intent goToDetail = new Intent(getActivity(),DetailActivity.class);
+                goToDetail.putExtra(Intent.EXTRA_INTENT,extraWeatherData);
+                startActivity(goToDetail);
+            }
+        });
 
         return rootView;
 
@@ -145,7 +158,7 @@ public class ForecastFragment extends Fragment {
                 resultStr[i]= day + " - " + description + " - " + heatInfo;
 
             }
-            
+
             return resultStr;
         }
 
