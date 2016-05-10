@@ -41,6 +41,7 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
+    private ArrayAdapter<String> forecastAdapter;
     public ForecastFragment() {
     }
 
@@ -56,9 +57,10 @@ public class ForecastFragment extends Fragment {
         String[] forecastArray ={"Today - Sunny - 88/63","Tomorrow - Foggy - 70/46",
                 "Weds - Cloudy - 72/63","Thurs - Rainy - 64/51",
                 "Fri - Foggy - 70/46","Sat - Sunny - 76/68"};
-        List<String> weekForecast = new ArrayList<>(Arrays.asList(forecastArray));
-        ListAdapter forecastAdapter = new ArrayAdapter<>(getActivity(),R.layout.list_item_forecast,R.id.list_item_forecast_textview,weekForecast);
 
+        List<String> weekForecast = new ArrayList<>(Arrays.asList(forecastArray));
+        forecastAdapter = new ArrayAdapter<>(getActivity(),R.layout.list_item_forecast,
+                                                         R.id.list_item_forecast_textview,weekForecast);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ListView listview_forecast = (ListView)rootView.findViewById(R.id.listview_forecast);
         listview_forecast.setAdapter(forecastAdapter);
@@ -85,7 +87,7 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
+    public class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
@@ -143,11 +145,7 @@ public class ForecastFragment extends Fragment {
                 resultStr[i]= day + " - " + description + " - " + heatInfo;
 
             }
-            for (String s : resultStr)
-            {
-                Log.v(LOG_TAG,"Forecast result: "+s);
-            }
-
+            
             return resultStr;
         }
 
@@ -205,11 +203,8 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJSONStr = buffer.toString();
-                Log.v("Verification String",forecastJSONStr);
-
-                
-
-            }catch(Exception e){
+            }
+            catch(Exception e){
                 Log.e(LOG_TAG,"Error",e);}
             finally {
                 if (urlConn != null)
@@ -224,10 +219,23 @@ public class ForecastFragment extends Fragment {
                 }
             }
             try {
-                return getWeatherDataFromJSON(forecastJSONStr, cnt);
+                 return getWeatherDataFromJSON(forecastJSONStr, cnt);
             }catch (JSONException e){e.printStackTrace();
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+
+            if(result!=null)
+            {
+                forecastAdapter.clear();
+                for (String s:result) {
+                    forecastAdapter.add(s);
+                }
+
+            }
         }
     }
 }
