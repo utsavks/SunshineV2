@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,12 +85,75 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class FetchWeatherTask extends AsyncTask<String,Void,Void> {
+    public static class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
+        private String getDateFormat(long time){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE dd MMM");
+            return dateFormat.format(time);
+        }
+
+        private String getTemperatureFormat(double high, double low){
+            long max = Math.round(high);
+            long min = Math.round(low);
+            String formattedOutput = max + " / " + min ;
+            return formattedOutput;
+        }
+
+        private String[] getWeatherDataFromJSON(String forecastJsonStr,int numDays)
+        throws JSONException{
+            final String LIST = "list";
+            final String DESCRIPTION = "main";
+            final String TEMPERATURE = "temp";
+            final String MAXIMUM = "max";
+            final String MINIMUM = "min";
+            final String WEATHER = "weather";
+
+            JSONObject weather = new JSONObject(forecastJsonStr);
+            JSONArray dayArray = weather.getJSONArray(LIST);
+
+            Time dayTime = new Time();
+            dayTime.setToNow();
+
+            int julianStartDay = Time.getJulianDay(System.currentTimeMillis(),dayTime.gmtoff);
+
+            dayTime = new Time();
+
+            String [] resultStr = new String[numDays];
+            for(int i=0;i<dayArray.length();i++)
+            {
+                String day;
+                String description;
+                String heatInfo;
+
+                long time = dayTime.setJulianDay(julianStartDay+i);
+                day = getDateFormat(time);
+
+                JSONObject dayInfo = dayArray.getJSONObject(i);
+                JSONObject descriptionList = dayInfo.getJSONArray(WEATHER).getJSONObject(0);
+                description = descriptionList.getString(DESCRIPTION);
+
+                JSONObject temperatureInfo = dayInfo.getJSONObject(TEMPERATURE);
+                double high = temperatureInfo.getDouble(MAXIMUM);
+                double low = temperatureInfo.getDouble(MINIMUM);
+
+                heatInfo = getTemperatureFormat(high, low);
+
+                resultStr[i]= day + " - " + description + " - " + heatInfo;
+
+            }
+            for (String s : resultStr)
+            {
+                Log.v(LOG_TAG,"Forecast result: "+s);
+            }
+
+            return resultStr;
+        }
+
+
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             if(params==null)
             {
                 return null;
@@ -96,7 +165,6 @@ public class ForecastFragment extends Fragment {
             String mode = "json";
             String units = "metric";
             int cnt = 7;
-
 
             try {
 
@@ -154,6 +222,10 @@ public class ForecastFragment extends Fragment {
                         Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
+            }
+            try {
+                return getWeatherDataFromJSON(forecastJSONStr, cnt);
+            }catch (JSONException e){e.printStackTrace();
             }
             return null;
         }
