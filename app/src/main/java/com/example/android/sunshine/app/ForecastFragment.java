@@ -112,6 +112,20 @@ public class ForecastFragment extends Fragment {
         updateWeather();
     }
 
+    private String getTemperatureFormat(double high, double low){
+        SharedPreferences heatPreference = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String unit = heatPreference.getString(getString(R.string.pref_units_key),
+                                               getString(R.string.pref_units_default));
+        if(!unit.equals(getString(R.string.pref_units_default)))
+        { high = (high*1.8) + 32.0;
+          low = (low*1.8) + 32.0;}
+        long max = Math.round(high);
+        long min = Math.round(low);
+
+        String formattedOutput = max + " / " + min ;
+        return formattedOutput;
+    }
+
     public class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
@@ -121,12 +135,7 @@ public class ForecastFragment extends Fragment {
             return dateFormat.format(time);
         }
 
-        private String getTemperatureFormat(double high, double low){
-            long max = Math.round(high);
-            long min = Math.round(low);
-            String formattedOutput = max + " / " + min ;
-            return formattedOutput;
-        }
+
 
         private String[] getWeatherDataFromJSON(String forecastJsonStr,int numDays)
         throws JSONException{
@@ -207,7 +216,6 @@ public class ForecastFragment extends Fragment {
                         .build();
 
                 URL url = new URL(uri.toString());
-                Log.v(LOG_TAG, "Built URI " + uri.toString());
 
                 urlConn = (HttpURLConnection) url.openConnection();
                 urlConn.setRequestMethod("GET");

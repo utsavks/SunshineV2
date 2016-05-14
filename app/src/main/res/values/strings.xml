@@ -13,5 +13,20 @@
     <string name="pref_location_title" translatable="false">location</string>
     <string name="pref_location_default" translatable="false">247667</string>
 
+    <string name="pref_units_key">Units</string>
+    <string name="pref_units_title" translatable="false">Temperature Units</string>
+    <string name="pref_units_dialog">Choose temperature unit</string>
+    <string name="pref_units_default">metric</string>
+
+
+    <string-array name="pref_units_values">
+        <item name="pref_units_metric">metric</item>
+        <item name="pref_units_imperial">imperial</item>
+    </string-array>
+
+    <string-array name="pref_units_options">
+        <item name="pref_units_label_metric">Metric</item>
+        <item name="pref_units_label_imperial">Imperial</item>
+    </string-array>
 
 </resources>
