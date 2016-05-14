@@ -252,6 +252,7 @@ public class ForecastFragment extends Fragment {
                 }
             }
             try {
+                if(forecastJSONStr!=null)
                  return getWeatherDataFromJSON(forecastJSONStr, cnt);
             }catch (JSONException e){e.printStackTrace();
             }

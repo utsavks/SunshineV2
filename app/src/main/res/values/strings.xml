@@ -18,7 +18,7 @@
     <string name="pref_units_title" translatable="false">Temperature Units</string>
     <string name="pref_units_dialog">Choose temperature unit</string>
     <string name="pref_units_default">metric</string>
-
+    <string name="action_share">Share</string>
 
 
     <string-array name="pref_units_values">
