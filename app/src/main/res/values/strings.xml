@@ -5,6 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh" translatable="false">Refresh</string>
+    <string name="action_map" translatable="false">Map</string>
     <string name="title_activity_detail">Details</string>
     <string name="data">Data</string>
     <string name="title_activity_settings">Settings</string>
@@ -17,6 +18,7 @@
     <string name="pref_units_title" translatable="false">Temperature Units</string>
     <string name="pref_units_dialog">Choose temperature unit</string>
     <string name="pref_units_default">metric</string>
+
 
 
     <string-array name="pref_units_values">
