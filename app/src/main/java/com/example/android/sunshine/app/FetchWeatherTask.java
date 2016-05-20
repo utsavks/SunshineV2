@@ -107,6 +107,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      */
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
         // Students: First, check if the location with this city name exists in the db
+        
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
         return -1;
