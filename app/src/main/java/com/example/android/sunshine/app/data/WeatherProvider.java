@@ -125,7 +125,7 @@ public class WeatherProvider extends ContentProvider {
         // WeatherContract to help define the types to the UriMatcher.
         sUriMatcher.addURI(CONTENT_AUTHORITY,PATH_WEATHER,WEATHER);
         sUriMatcher.addURI(CONTENT_AUTHORITY,PATH_WEATHER+"/*",WEATHER_WITH_LOCATION);
-        sUriMatcher.addURI(CONTENT_AUTHORITY,PATH_WEATHER+"/*/*",WEATHER_WITH_LOCATION_AND_DATE);
+        sUriMatcher.addURI(CONTENT_AUTHORITY,PATH_WEATHER+"/*/#",WEATHER_WITH_LOCATION_AND_DATE);
         sUriMatcher.addURI(CONTENT_AUTHORITY,PATH_LOCATION,LOCATION);
 
         // 3) Return the new matcher!
@@ -154,9 +154,7 @@ public class WeatherProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
-//            case WEATHER_WITH_LOCATION_AND_DATE:
-//            case WEATHER_WITH_LOCATION:
+
             case WEATHER:
                 return WeatherEntry.CONTENT_TYPE;
             case LOCATION:
@@ -190,12 +188,29 @@ public class WeatherProvider extends ContentProvider {
             }
             // "weather"
             case WEATHER: {
-                retCursor = null;
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        WeatherEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             // "location"
             case LOCATION: {
-                retCursor = null;
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        LocationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
 
@@ -225,6 +240,7 @@ public class WeatherProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
