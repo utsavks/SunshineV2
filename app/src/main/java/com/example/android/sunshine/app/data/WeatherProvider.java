@@ -161,6 +161,10 @@ public class WeatherProvider extends ContentProvider {
                 return WeatherEntry.CONTENT_TYPE;
             case LOCATION:
                 return LocationEntry.CONTENT_TYPE;
+            case WEATHER_WITH_LOCATION:
+                return WeatherEntry.CONTENT_TYPE;
+            case WEATHER_WITH_LOCATION_AND_DATE:
+                return WeatherEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
