@@ -3,14 +3,16 @@ Sunshine
 
 Sunshine is the companion Android app for the Udacity course [Developing Android Apps: Android Fundamentals](https://www.udacity.com/course/ud853).
 
-Take the course to find out how to build this app a step at a time, and eventually create your own Android App!
+This is the third version of the Sunshine code which I have written following the course.
 
-This is the second version of the Sunshine code. The repository has been updated on:
+It's a weather app which shows two week forecast result of weather in a city that the user has chosen,
+using the OpenWeatherMap API. It also has settings for switching temperature units from Imperial to
+Metric. The user can also open up a map through the app to display the current city, whose weather
+report is being shown. On clicking one of the forecasts, a detailed weather report is displayed
+(Including humidity, wind speed & direction, pressure, etc.)
 
-* **February 13th, 2015** - Major update
-* February 25, 2015 - Minor bug fixes
-* March 4th, 2015 - Minor bug fixes
+#Fundamental Concepts Involved 
+Connecting app with cloud i.e. Networking, JSON parsing, Using background threads, Activity life cycles, Databases, Content Providers (even made one for the app), Cursor Adapters and Loaders, Designing menu items and working with Shared Preferences and
+ShareActionProviders, Implicit intents, Broadcast receivers and their application, etc.
 
 For the original version, please go [here](https://github.com/udacity/Sunshine).
-
-A changelog for the course can be found [here](https://docs.google.com/a/knowlabs.com/document/d/193xJb_OpcNCqgquMhxPrMh05IEYFXQqt0S6-6YK8gBw/pub).
