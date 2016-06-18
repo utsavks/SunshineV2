@@ -25,30 +25,21 @@ public class ForecastAdapter extends CursorAdapter {
     /**
      * Prepare the weather high/lows for presentation.
      */
-    private String formatHighLows(double high, double low) {
+    private String[] formatHighLows(double high, double low) {
         boolean isMetric = Utility.isMetric(mContext);
-        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
-        return highLowStr;
+        return new String[]{Utility.formatTemperature(high, isMetric) , Utility.formatTemperature(low, isMetric)};
     }
 
     /*
         This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
         string.
      */
-    private String convertCursorRowToUXFormat(Cursor cursor) {
-        // get row indices for our cursor
-//        int idx_max_temp = cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP);
-//        int idx_min_temp = cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP);
-//        int idx_date = cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE);
-//        int idx_short_desc = cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC);
+    private String[] convertCursorRowToUXFormat(Cursor cursor) {
 
-        String highAndLow = formatHighLows(
+        return formatHighLows(
                 cursor.getDouble(COL_WEATHER_MAX_TEMP),
                 cursor.getDouble(COL_WEATHER_MIN_TEMP));
 
-        return Utility.formatDate(cursor.getLong(COL_WEATHER_DATE)) +
-                " - " + cursor.getString(COL_WEATHER_DESC) +
-                " - " + highAndLow;
     }
 
     /*
@@ -69,7 +60,22 @@ public class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
-//        TextView tv = (TextView)view;
-//        tv.setText(convertCursorRowToUXFormat(cursor));
+        String[] temperatureValues = convertCursorRowToUXFormat(cursor);
+        String maxTemperature = temperatureValues[0];
+        String minTemperature = temperatureValues[1];
+        String description = cursor.getString(COL_WEATHER_DESC);
+
+        String date = Utility.getFriendlyDayString(context,cursor.getLong(COL_WEATHER_DATE));
+
+        TextView date_textview = (TextView) view.findViewById(R.id.list_item_date_textview);
+        TextView forecast_textview = (TextView)view.findViewById(R.id.list_item_forecast_textview);
+        TextView high_textview = (TextView)view.findViewById(R.id.list_item_high_textview);
+        TextView low_textview = (TextView)view.findViewById(R.id.list_item_low_textview);
+
+        date_textview.setText(date);
+        forecast_textview.setText(description);
+        high_textview.setText(maxTemperature+"°");
+        low_textview.setText(minTemperature+"°");
+
     }
 }
