@@ -21,35 +21,21 @@ public class ForecastAdapter extends CursorAdapter {
 
     private final int VIEW_TYPE_TODAY = 0;
     private final int VIEW_TYPE_OTHER_DAY = 1;
+
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
 
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
     private String[] formatHighLows(double high, double low) {
         boolean isMetric = Utility.isMetric(mContext);
-        return new String[]{Utility.formatTemperature(high, isMetric) , Utility.formatTemperature(low, isMetric)};
-    }
-
-    /*
-        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-        string.
-     */
-    private String[] convertCursorRowToUXFormat(Cursor cursor) {
-
-        return formatHighLows(
-                cursor.getDouble(COL_WEATHER_MAX_TEMP),
-                cursor.getDouble(COL_WEATHER_MIN_TEMP));
-
+        return new String[]{Utility.formatTemperature(mContext, high, isMetric), Utility.formatTemperature(mContext, low, isMetric)};
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        return (position==0) ? VIEW_TYPE_TODAY : VIEW_TYPE_OTHER_DAY;
+        return (position == 0) ? VIEW_TYPE_TODAY : VIEW_TYPE_OTHER_DAY;
     }
 
     @Override
@@ -65,14 +51,14 @@ public class ForecastAdapter extends CursorAdapter {
         int layout = getItemViewType(cursor.getPosition());
         int layoutID = -1;
 
-        if(layout == VIEW_TYPE_TODAY)
+        if (layout == VIEW_TYPE_TODAY)
             layoutID = R.layout.list_item_forecast_today;
         else if (layout == VIEW_TYPE_OTHER_DAY)
-        layoutID = R.layout.list_item_forecast;
+            layoutID = R.layout.list_item_forecast;
         else
-            Log.e("Forecast Adapter","No such layout available for inflation");
+            Log.e("Forecast Adapter", "No such layout available for inflation");
 
-         View view = LayoutInflater.from(context).inflate(layoutID, parent, false);
+        View view = LayoutInflater.from(context).inflate(layoutID, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
@@ -86,12 +72,14 @@ public class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
-        String[] temperatureValues = convertCursorRowToUXFormat(cursor);
+        String[] temperatureValues = formatHighLows(
+                cursor.getDouble(COL_WEATHER_MAX_TEMP),
+                cursor.getDouble(COL_WEATHER_MIN_TEMP));
         String maxTemperature = temperatureValues[0];
         String minTemperature = temperatureValues[1];
         String description = cursor.getString(COL_WEATHER_DESC);
 
-        String date = Utility.getFriendlyDayString(context,cursor.getLong(COL_WEATHER_DATE));
+        String date = Utility.getFriendlyDayString(context, cursor.getLong(COL_WEATHER_DATE));
 
 //        TextView date_textview = (TextView) view.findViewById(R.id.list_item_date_textview);
 //        TextView forecast_textview = (TextView)view.findViewById(R.id.list_item_forecast_textview);
@@ -102,12 +90,12 @@ public class ForecastAdapter extends CursorAdapter {
 
         viewHolder.date_textview.setText(date);
         viewHolder.forecast_textview.setText(description);
-        viewHolder.high_textview.setText(maxTemperature+"°");
-        viewHolder.low_textview.setText(minTemperature+"°");
+        viewHolder.high_textview.setText(maxTemperature);
+        viewHolder.low_textview.setText(minTemperature);
 
     }
 
-    public static class ViewHolder{
+    public static class ViewHolder {
 
         TextView date_textview;
         TextView forecast_textview;
@@ -116,9 +104,9 @@ public class ForecastAdapter extends CursorAdapter {
 
         public ViewHolder(View view) {
             date_textview = (TextView) view.findViewById(R.id.list_item_date_textview);
-            forecast_textview = (TextView)view.findViewById(R.id.list_item_forecast_textview);
-            high_textview = (TextView)view.findViewById(R.id.list_item_high_textview);
-            low_textview = (TextView)view.findViewById(R.id.list_item_low_textview);
+            forecast_textview = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+            high_textview = (TextView) view.findViewById(R.id.list_item_high_textview);
+            low_textview = (TextView) view.findViewById(R.id.list_item_low_textview);
         }
     }
 }
