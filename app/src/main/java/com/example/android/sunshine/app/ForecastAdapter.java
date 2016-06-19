@@ -3,6 +3,7 @@ package com.example.android.sunshine.app;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,9 @@ import static com.example.android.sunshine.app.ForecastFragment.*;
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
 public class ForecastAdapter extends CursorAdapter {
+
+    private final int VIEW_TYPE_TODAY = 0;
+    private final int VIEW_TYPE_OTHER_DAY = 1;
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
@@ -42,13 +46,35 @@ public class ForecastAdapter extends CursorAdapter {
 
     }
 
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position==0) ? VIEW_TYPE_TODAY : VIEW_TYPE_OTHER_DAY;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
     /*
-        Remember that these views are reused as needed.
-     */
+            Remember that these views are reused as needed.
+         */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
+        int layout = getItemViewType(cursor.getPosition());
+        int layoutID = -1;
 
+        if(layout == VIEW_TYPE_TODAY)
+            layoutID = R.layout.list_item_forecast_today;
+        else if (layout == VIEW_TYPE_OTHER_DAY)
+        layoutID = R.layout.list_item_forecast;
+        else
+            Log.e("Forecast Adapter","No such layout available for inflation");
+
+         View view = LayoutInflater.from(context).inflate(layoutID, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
         return view;
     }
 
@@ -67,15 +93,32 @@ public class ForecastAdapter extends CursorAdapter {
 
         String date = Utility.getFriendlyDayString(context,cursor.getLong(COL_WEATHER_DATE));
 
-        TextView date_textview = (TextView) view.findViewById(R.id.list_item_date_textview);
-        TextView forecast_textview = (TextView)view.findViewById(R.id.list_item_forecast_textview);
-        TextView high_textview = (TextView)view.findViewById(R.id.list_item_high_textview);
-        TextView low_textview = (TextView)view.findViewById(R.id.list_item_low_textview);
+//        TextView date_textview = (TextView) view.findViewById(R.id.list_item_date_textview);
+//        TextView forecast_textview = (TextView)view.findViewById(R.id.list_item_forecast_textview);
+//        TextView high_textview = (TextView)view.findViewById(R.id.list_item_high_textview);
+//        TextView low_textview = (TextView)view.findViewById(R.id.list_item_low_textview);
 
-        date_textview.setText(date);
-        forecast_textview.setText(description);
-        high_textview.setText(maxTemperature+"°");
-        low_textview.setText(minTemperature+"°");
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
+        viewHolder.date_textview.setText(date);
+        viewHolder.forecast_textview.setText(description);
+        viewHolder.high_textview.setText(maxTemperature+"°");
+        viewHolder.low_textview.setText(minTemperature+"°");
+
+    }
+
+    public static class ViewHolder{
+
+        TextView date_textview;
+        TextView forecast_textview;
+        TextView high_textview;
+        TextView low_textview;
+
+        public ViewHolder(View view) {
+            date_textview = (TextView) view.findViewById(R.id.list_item_date_textview);
+            forecast_textview = (TextView)view.findViewById(R.id.list_item_forecast_textview);
+            high_textview = (TextView)view.findViewById(R.id.list_item_high_textview);
+            low_textview = (TextView)view.findViewById(R.id.list_item_low_textview);
+        }
     }
 }
